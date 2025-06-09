@@ -1,12 +1,29 @@
 import { useState, useEffect, useRef } from "react";
 
 export default function Mistunnel() {
-  const [activeSection, setActiveSection] = useState("browser");
+  const [activeSection, setActiveSection] = useState("home");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isBlankMode, setIsBlankMode] = useState(false);
   const [isAntiClose, setIsAntiClose] = useState(false);
   const [url, setUrl] = useState("https://duckduckgo.com");
+  const [tabIcon, setTabIcon] = useState("default");
   const browserFrameRef = useRef<HTMLIFrameElement>(null);
+
+  // Tab icon options
+  const tabIcons = {
+    default: { favicon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%2387ceeb'/%3E%3Ctext x='8' y='11' font-family='Arial' font-size='8' font-weight='bold' text-anchor='middle' fill='black'%3EM%3C/text%3E%3C/svg%3E", title: "Mistunnel" },
+    classroom: { favicon: "https://ssl.gstatic.com/classroom/favicon.png", title: "Google Classroom" },
+    drive: { favicon: "https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico", title: "Google Drive" },
+    docs: { favicon: "https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico", title: "Google Docs" },
+    gmail: { favicon: "https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico", title: "Gmail" },
+    youtube: { favicon: "https://www.youtube.com/s/desktop/f506bd45/img/favicon_32x32.png", title: "YouTube" },
+    discord: { favicon: "https://discord.com/assets/f8389ca1a741a115313bede9ac02e2c0.ico", title: "Discord" },
+    tiktok: { favicon: "https://sf16-website-login.neutral.ttwstatic.com/obj/tiktok_web_login_static/tiktok/webapp/main/webapp-desktop/8152caf0c8e8bc67ae0d.ico", title: "TikTok" },
+    canvas: { favicon: "https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico", title: "Canvas" },
+    khan: { favicon: "https://cdn.kastatic.org/images/favicon.ico", title: "Khan Academy" },
+    google: { favicon: "https://www.google.com/favicon.ico", title: "Google" },
+    clever: { favicon: "https://assets.clever.com/resource/favicon.ico", title: "Clever Portal" }
+  };
 
   // Handle anti-close functionality
   useEffect(() => {
@@ -26,6 +43,23 @@ export default function Mistunnel() {
     };
   }, [isAntiClose]);
 
+  // Handle tab icon and title changes
+  useEffect(() => {
+    const iconData = tabIcons[tabIcon as keyof typeof tabIcons] || tabIcons.default;
+    
+    // Update favicon
+    let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.getElementsByTagName('head')[0].appendChild(link);
+    }
+    link.href = iconData.favicon;
+    
+    // Update title
+    document.title = iconData.title;
+  }, [tabIcon]);
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -39,9 +73,24 @@ export default function Mistunnel() {
     if (isBlankMode) {
       const win = window.open('about:blank', '_blank');
       if (win) {
+        const iconData = tabIcons[tabIcon as keyof typeof tabIcons] || tabIcons.default;
         win.document.write(`
-          <iframe src="${proxyUrl}" style="width:100%;height:100%;border:none;" frameborder="0"></iframe>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>${iconData.title}</title>
+            <link rel="icon" href="${iconData.favicon}">
+            <style>
+              body { margin: 0; padding: 0; overflow: hidden; }
+              iframe { width: 100%; height: 100vh; border: none; }
+            </style>
+          </head>
+          <body>
+            <iframe src="${proxyUrl}" frameborder="0"></iframe>
+          </body>
+          </html>
         `);
+        win.document.close();
       }
     } else {
       window.open(proxyUrl, '_blank');
@@ -104,8 +153,8 @@ export default function Mistunnel() {
       
       <nav className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <ul className="sidebar-nav">
-          <li><a href="#" onClick={() => showSection('browser')}>🌐 Browser</a></li>
           <li><a href="#" onClick={() => showSection('home')}>🏠 Home</a></li>
+          <li><a href="#" onClick={() => showSection('browser')}>🌐 Browser</a></li>
           <li><a href="#" onClick={() => showSection('proxies')}>🔗 Proxies</a></li>
           <li><a href="#" onClick={() => showSection('games')}>🎮 Games</a></li>
           <li><a href="#" onClick={() => showSection('settings')}>⚙️ Settings</a></li>
@@ -277,6 +326,32 @@ export default function Mistunnel() {
               </div>
               <p style={{marginTop:'10px', fontSize:'0.9rem', color:'#ccc'}}>
                 Customize the background color of the website
+              </p>
+            </div>
+            <div className="setting-item">
+              <div className="setting-toggle">
+                <span>Tab Icon & Title</span>
+                <select 
+                  className="tab-icon-select" 
+                  value={tabIcon}
+                  onChange={(e) => setTabIcon(e.target.value)}
+                >
+                  <option value="default">Mistunnel</option>
+                  <option value="clever">Clever Portal</option>
+                  <option value="classroom">Google Classroom</option>
+                  <option value="drive">Google Drive</option>
+                  <option value="docs">Google Docs</option>
+                  <option value="canvas">Canvas</option>
+                  <option value="youtube">YouTube</option>
+                  <option value="discord">Discord</option>
+                  <option value="tiktok">TikTok</option>
+                  <option value="gmail">Gmail</option>
+                  <option value="khan">Khan Academy</option>
+                  <option value="google">Google</option>
+                </select>
+              </div>
+              <p style={{marginTop:'10px', fontSize:'0.9rem', color:'#ccc'}}>
+                Change the tab icon and title to disguise the website
               </p>
             </div>
             <div className="setting-item">
