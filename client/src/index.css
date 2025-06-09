@@ -410,6 +410,28 @@
   cursor: pointer;
 }
 
+.tab-icon-select {
+  background: hsla(0, 0%, 7.8%, 0.9);
+  color: white;
+  border: 2px solid hsl(0, 0%, 20%);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.tab-icon-select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 10px hsla(198, 71%, 73%, 0.3);
+}
+
+.tab-icon-select option {
+  background: hsl(0, 0%, 10%);
+  color: white;
+}
+
 /* Social links */
 .social-links {
   display: flex;
